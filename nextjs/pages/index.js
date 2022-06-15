@@ -1,26 +1,18 @@
+import Head from "next/head";
+import { Fragment } from "react";
+
 import MeetupList from "../components/meetups/MeetupList";
 
-const meetups = [
-  {
-    id: "m1",
-    title: "First one",
-    image:
-      "https://iso.500px.com/wp-content/uploads/2016/03/stock-photo-142984111.jpg",
-    address: "Kazlu ruda 5, Kaunas",
-    description: "kazka kazka",
-  },
-  {
-    id: "m2",
-    title: "Second one",
-    image:
-      "https://iso.500px.com/wp-content/uploads/2016/03/stock-photo-142984111.jpg",
-    address: "Kazlauskiskes 12, Kaunas",
-    description: "kazka kazka daugiau",
-  },
-];
-
 const HomePage = (props) => {
-  return <MeetupList meetups={props.meetups} />;
+  return (
+    <Fragment>
+      <Head>
+        <title>Meetup Application</title>
+        <meta name="description" content="bla bla bla" />
+      </Head>
+      <MeetupList meetups={props.meetups} />;
+    </Fragment>
+  );
 };
 
 // export const getServerSideProps = async (context) => {
@@ -35,9 +27,27 @@ const HomePage = (props) => {
 // };
 
 export const getStaticProps = async () => {
+  const response = await fetch(
+    "https://react-learning1-default-rtdb.europe-west1.firebasedatabase.app/meetups.json"
+  );
+
+  const responseData = await response.json();
+
+  const loadedMeetups = [];
+
+  for (const key in responseData) {
+    loadedMeetups.push({
+      id: key,
+      title: responseData[key].title,
+      image: responseData[key].image,
+      address: responseData[key].address,
+      description: responseData[key].description,
+    });
+  }
+
   return {
     props: {
-      meetups: meetups,
+      meetups: loadedMeetups,
     },
     revalidate: 10,
   };
